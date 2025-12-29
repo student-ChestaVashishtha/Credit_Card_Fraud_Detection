@@ -1,198 +1,150 @@
-💳 Credit Card Fraud Detection under Extreme Class Imbalance
-📌 Project Overview
+# 💳 Credit Card Fraud Detection under Extreme Class Imbalance
 
-This project tackles credit card fraud detection, a real-world machine learning problem with extreme class imbalance (~0.17% fraud). The goal is not high accuracy, but effective fraud detection with minimal false alarms.
+## 📌 Project Overview
+This project focuses on **credit card fraud detection**, a real-world machine learning problem characterized by **extreme class imbalance**.
 
-Multiple models were implemented, tuned, and evaluated using probability-based, recall-oriented metrics:
+- **Total transactions:** 284,807  
+- **Fraud cases:** 492  
+- **Fraud ratio:** ~0.17%
 
-XGBoost + SMOTE (tuned)
+The goal is to **maximize fraud detection (recall)** while **controlling false positives**, which is critical in financial systems.
 
-Artificial Neural Network (ANN) with class-weighted loss and threshold optimization
+---
 
-🎯 Problem Characteristics
+## 📊 Dataset Distribution
+| Class | Description        | Count |
+|------|--------------------|-------|
+| 0    | Non-Fraud          | 284,315 |
+| 1    | Fraud              | 492 |
 
-Fraud detection is cost-sensitive
+---
 
-False Negatives (missed fraud) → direct financial loss
+## 🛠️ Models Implemented
+The following models were implemented and compared **without applying PCA**, preserving full feature information:
 
-False Positives → customer inconvenience
+### 1️⃣ XGBoost (Class Weighting)
+- Used `scale_pos_weight` to handle imbalance
+- No synthetic data generation
+- Optimized for precision–recall trade-off
 
-Hence, the focus is on:
+### 2️⃣ XGBoost + SMOTE (Baseline & Tuned)
+- Applied **SMOTE** only on training data
+- Evaluated baseline and fine-tuned versions
+- Compared against ANN for robustness
 
-PR-AUC
+### 3️⃣ Artificial Neural Network (ANN)
+- Fully connected feed-forward network
+- Trained on original **imbalanced data**
+- Decision threshold optimized using **F2-score**
+- Focused on **high recall at low false positive rate**
 
-Fraud recall
+---
 
-Recall under low false positive rate constraints
+## 📐 Evaluation Metrics
+Due to severe imbalance, **accuracy is not reliable**.  
+The following metrics were emphasized:
 
-F₂ score (recall-weighted)
+- **PR-AUC (Primary metric)**
+- **Recall**
+- **Precision**
+- **F2-Score** (recall-oriented)
+- **Recall @ Low FPR (≤ 0.5%)**
+- Confusion Matrix
 
-📊 Dataset
+---
 
-Total transactions: 284,807
+## 📈 Model Performance Summary
 
-Class distribution:
+### 🔹 XGBoost + SMOTE (Fine-Tuned)
 
-Class	Count
-Legitimate (0)	284,315
-Fraud (1)	492
+PR-AUC: 0.8093
+Precision: 0.7945
+Recall: 0.7733
+F2-score: 0.7838
 
-Fraud rate ≈ 0.17%
+### 🔹 XGBoost (Class Weight Only)
 
-Features: anonymized continuous variables (V1–V28), Time, Amount
+PR-AUC: 0.7890
+Precision: 0.8871
+Recall: 0.7333
+F2-score: 0.8029
 
-⚠️ Due to extreme imbalance, accuracy is not a meaningful metric.
 
-🧠 Models & Training Strategy
-1️⃣ XGBoost + SMOTE (Tuned)
+---
 
-Gradient boosting decision trees
+### 🔹 Artificial Neural Network (ANN)
+PR-AUC: 0.8059
+ROC-AUC: 0.9879
+Best F2-score: 0.7917
+Recall @ FPR ≈ 0.5%: 0.8533
 
-Imbalance handled using:
 
-SMOTE (applied only on training data)
+**Confusion Matrix (ANN):**
+[[56884 3]
+[ 18 57]]
 
-Hyperparameter tuning
 
-Evaluated using predicted probabilities
+---
 
-Metrics optimized post-training using threshold-based evaluation
+## 🔁 Cross-Validation (ANN)
+- Performed cross-validation to ensure **generalization**
+- Stable PR-AUC and recall across folds
+- Confirms ANN is **not overfitting**
 
-2️⃣ Artificial Neural Network (ANN)
+---
 
-Fully connected binary classifier with sigmoid output
+## 🏆 Final Comparison & Conclusion
 
-Training strategy:
+| Metric | XGBoost + SMOTE | ANN |
+|------|----------------|-----|
+| PR-AUC | **0.8093** | 0.8059 |
+| Recall | 0.7733 | **0.7600** |
+| Precision | 0.7945 | **0.9500** |
+| Recall @ Low FPR | ❌ Not optimized | **0.8533** |
+| Threshold tuning | Limited | **F2-optimized** |
 
-Class-weighted binary cross-entropy
+### ✅ Final Verdict
+Although **XGBoost + SMOTE achieves slightly higher PR-AUC**, the **ANN is better suited for real-world deployment** because:
 
-Early stopping monitored on PR-AUC
+- Higher **precision**
+- Much better **recall at low false positive rates**
+- No reliance on synthetic data
+- Robust threshold optimization
 
-Post-training:
+➡️ **ANN outperforms XGBoost in operational fraud detection scenarios**.
 
-Probability-based evaluation
+---
 
-Threshold optimization using F₂ score (β = 2)
+## 🚀 Key Takeaways
+- Accuracy is misleading for imbalanced problems
+- PR-AUC and Recall @ Low FPR are critical
+- ANN with threshold tuning can outperform tree models
+- PCA is not mandatory for strong performance
 
-Robustness checked using cross-validation
+---
 
-📐 Evaluation Methodology
+## 📌 Internship Relevance
+This project demonstrates:
+- Real-world imbalanced ML handling
+- Advanced evaluation techniques
+- Model comparison & business-driven metrics
+- Production-oriented decision making
 
-Because fraud prevalence is only 0.17%:
+**Highly suitable for ML / Data Science internship applications.**
 
-Accuracy is misleading (>99.8% achievable with trivial models)
+---
 
-Models are evaluated using:
+## 📂 Tech Stack
+- Python
+- NumPy, Pandas
+- Scikit-learn
+- XGBoost
+- TensorFlow / Keras
+- Imbalanced-learn (SMOTE)
 
-PR-AUC (Average Precision)
+---
 
-Fraud recall
+## 👤 Author
+**Chesta Vashishtha**  
+B.Tech (3rd Year) | Machine Learning Enthusiast  
 
-Precision
-
-F₂ score
-
-Recall @ low False Positive Rate (≈ 0.5%)
-
-All metrics are computed from predicted probabilities, not hard class labels.
-
-📈 Results Comparison (Final)
-🔹 Tuned XGBoost + SMOTE
-PR-AUC     : 0.8093
-Precision  : 0.79
-Recall     : 0.77
-F2-score   : 0.784
-
-
-Classification summary:
-
-Frauds detected: ~58 / 75
-
-Balanced precision–recall tradeoff
-
-Strong baseline for tabular fraud detection
-
-🔹 Artificial Neural Network (Final Model)
-PR-AUC (AP)          : 0.8059
-ROC-AUC              : 0.9879
-Precision (Fraud)    : 0.95
-Recall (Fraud)       : 0.76
-Best F2-score        : 0.7917
-Recall @ FPR ≈ 0.5%  : 0.8533
-
-
-Confusion Matrix:
-
-[[56884     3]
- [   18    57]]
-
-
-Frauds detected: 57 / 75
-
-Only 3 false positives at the selected operating point
-
-🔁 Cross-Validation (ANN)
-
-ANN performance was validated using cross-validation
-
-PR-AUC and recall remained consistent across folds, indicating:
-
-Stable learning
-
-No overfitting to a single split
-
-Reliable probability calibration
-
-🏆 Model Selection & Final Conclusion
-
-Although tuned XGBoost + SMOTE achieved the highest PR-AUC (0.8093), the ANN was selected as the final model because:
-
-Comparable PR-AUC performance
-
-Higher precision (fewer false alarms)
-
-Superior recall at low false positive rate, which is critical in production fraud systems
-
-Stable performance confirmed via cross-validation
-
-This demonstrates that model selection should be driven by operational metrics and deployment constraints, not by algorithm popularity alone.
-
-📌 Final Takeaways
-
-Accuracy is misleading in extreme imbalance scenarios
-
-PR-AUC is the most informative ranking metric for fraud detection
-
-Threshold optimization is essential for real-world deployment
-
-Neural networks can outperform tree models when probability calibration and objectives are aligned
-
-🛠️ Tech Stack
-
-Python
-
-NumPy, Pandas
-
-Scikit-learn
-
-XGBoost
-
-TensorFlow / Keras
-
-Matplotlib
-
-🚀 Future Improvements
-
-Time-based splitting to model data drift
-
-Cost-sensitive loss functions
-
-Probability calibration (Platt / Isotonic)
-
-Real-time fraud detection dashboard
-
-👤 Author
-
-Chesta Vashishtha
-B.Tech (3rd Year)
-Aspiring Machine Learning Engineer
